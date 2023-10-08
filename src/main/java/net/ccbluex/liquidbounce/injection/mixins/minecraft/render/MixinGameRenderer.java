@@ -24,9 +24,6 @@ import net.ccbluex.liquidbounce.event.GameRenderEvent;
 import net.ccbluex.liquidbounce.event.ScreenRenderEvent;
 import net.ccbluex.liquidbounce.event.WorldRenderEvent;
 import net.ccbluex.liquidbounce.interfaces.IMixinGameRenderer;
-import net.ccbluex.liquidbounce.utils.aiming.RaytracingExtensionsKt;
-import net.ccbluex.liquidbounce.utils.aiming.Rotation;
-import net.ccbluex.liquidbounce.utils.aiming.RotationManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -83,24 +80,6 @@ public abstract class MixinGameRenderer implements IMixinGameRenderer {
         EventManager.INSTANCE.callEvent(new GameRenderEvent());
     }
 
-    /**
-     * We change crossHairTarget according to server side rotations
-     */
-    @Redirect(method = "updateTargetedEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;raycast(DFZ)Lnet/minecraft/util/hit/HitResult;"))
-    private HitResult hookRaycast(Entity instance, double maxDistance, float tickDelta, boolean includeFluids) {
-        if (instance != client.player) return instance.raycast(maxDistance, tickDelta, includeFluids);
-
-        Rotation rotation = (RotationManager.INSTANCE.getCurrentRotation() != null) ? RotationManager.INSTANCE.getCurrentRotation() : new Rotation(client.player.getYaw(tickDelta), client.player.getPitch(tickDelta));
-
-        return RaytracingExtensionsKt.raycast(maxDistance, rotation, includeFluids);
-    }
-
-    @Redirect(method = "updateTargetedEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getRotationVec(F)Lnet/minecraft/util/math/Vec3d;"))
-    private Vec3d hookRotationVector(Entity instance, float tickDelta) {
-        Rotation rotation = RotationManager.INSTANCE.getCurrentRotation();
-
-        return rotation != null ? rotation.getRotationVec() : instance.getRotationVec(tickDelta);
-    }
 
     /**
      * Hook world render event

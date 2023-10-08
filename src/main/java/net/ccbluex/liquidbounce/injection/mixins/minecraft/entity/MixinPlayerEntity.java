@@ -23,8 +23,6 @@ import net.ccbluex.liquidbounce.event.EventManager;
 import net.ccbluex.liquidbounce.event.PlayerJumpEvent;
 import net.ccbluex.liquidbounce.event.PlayerSafeWalkEvent;
 import net.ccbluex.liquidbounce.event.PlayerStrideEvent;
-import net.ccbluex.liquidbounce.utils.aiming.Rotation;
-import net.ccbluex.liquidbounce.utils.aiming.RotationManager;
 import net.ccbluex.liquidbounce.utils.client.SilentHotbar;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -81,22 +79,6 @@ public abstract class MixinPlayerEntity extends MixinLivingEntity {
         if (event.isSafeWalk()) {
             callbackInfoReturnable.setReturnValue(true);
         }
-    }
-
-    /**
-     * Hook velocity rotation modification
-     * <p>
-     * There are a few velocity changes when attacking an entity, which could be easily detected by anti-cheats when a different server-side rotation is applied.
-     */
-    @Redirect(method = "attack", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;getYaw()F"))
-    private float hookFixRotation(PlayerEntity entity) {
-        RotationManager rotationManager = RotationManager.INSTANCE;
-        Rotation rotation = rotationManager.getCurrentRotation();
-        if (rotationManager.getActiveConfigurable() == null || !rotationManager.getActiveConfigurable().getFixVelocity() || rotation == null) {
-            return entity.getYaw();
-        }
-
-        return rotation.getYaw();
     }
 
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;isSpectator()Z", shift = At.Shift.BEFORE))
