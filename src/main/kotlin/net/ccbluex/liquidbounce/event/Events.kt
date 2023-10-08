@@ -20,7 +20,6 @@ package net.ccbluex.liquidbounce.event
 
 import net.ccbluex.liquidbounce.config.Value
 import net.ccbluex.liquidbounce.features.chat.client.packet.User
-import net.ccbluex.liquidbounce.features.module.Module
 import net.ccbluex.liquidbounce.utils.client.Nameable
 import net.ccbluex.liquidbounce.utils.movement.DirectionalInput
 import net.minecraft.block.Block
@@ -207,9 +206,6 @@ class ClientShutdownEvent : Event()
 
 @Nameable("valueChanged")
 class ValueChangedEvent(val value: Value<*>) : Event()
-
-@Nameable("toggleModule")
-class ToggleModuleEvent(val module: Module, val newState: Boolean, val ignoreCondition: Boolean = false) : Event()
 
 @Nameable("notification")
 class NotificationEvent(val title: String, val message: String, val severity: Severity) : Event() {

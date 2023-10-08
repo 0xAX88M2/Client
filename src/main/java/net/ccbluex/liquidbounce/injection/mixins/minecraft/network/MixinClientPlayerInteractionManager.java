@@ -22,9 +22,6 @@ import net.ccbluex.liquidbounce.event.AttackEvent;
 import net.ccbluex.liquidbounce.event.BlockBreakingProgressEvent;
 import net.ccbluex.liquidbounce.event.CancelBlockBreakingEvent;
 import net.ccbluex.liquidbounce.event.EventManager;
-import net.ccbluex.liquidbounce.features.module.modules.combat.ModuleAutoBow;
-import net.ccbluex.liquidbounce.features.module.modules.combat.ModuleAutoClicker;
-import net.ccbluex.liquidbounce.features.module.modules.player.ModuleReach;
 import net.ccbluex.liquidbounce.utils.aiming.Rotation;
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager;
 import net.ccbluex.liquidbounce.utils.client.SilentHotbar;
@@ -84,27 +81,6 @@ public class MixinClientPlayerInteractionManager {
         return SilentHotbar.INSTANCE.getServersideSlot();
     }
 
-    @Inject(method = "getReachDistance", at = @At("HEAD"), cancellable = true)
-    private void hookReachA(CallbackInfoReturnable<Float> cir) {
-        if (ModuleReach.INSTANCE.getEnabled()) {
-            cir.setReturnValue(ModuleReach.INSTANCE.getMaxReach());
-        }
-    }
-
-    @Inject(method = "hasExtendedReach", at = @At("HEAD"), cancellable = true)
-    private void hookReachB(CallbackInfoReturnable<Boolean> cir) {
-        if (ModuleReach.INSTANCE.getEnabled()) {
-            cir.setReturnValue(false);
-        }
-    }
-
-    @Inject(method = "hasLimitedAttackSpeed", at = @At("HEAD"), cancellable = true)
-    private void injectAutoClicker(CallbackInfoReturnable<Boolean> cir) {
-        if (ModuleAutoClicker.INSTANCE.getEnabled() && ModuleAutoClicker.Left.INSTANCE.getEnabled()) {
-            cir.setReturnValue(false);
-        }
-    }
-
     /**
      * Hook rotation-type packet modification
      * <p>
@@ -121,8 +97,4 @@ public class MixinClientPlayerInteractionManager {
         args.set(4, rotation.getPitch());
     }
 
-    @Inject(method = "stopUsingItem", at = @At("HEAD"))
-    private void stopUsingItem(PlayerEntity player, CallbackInfo callbackInfo) {
-        ModuleAutoBow.onStopUsingItem();
-    }
 }

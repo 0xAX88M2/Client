@@ -19,7 +19,6 @@
 
 package net.ccbluex.liquidbounce.render.engine
 
-import net.ccbluex.liquidbounce.features.module.modules.render.ModuleNametags
 import net.ccbluex.liquidbounce.utils.math.Mat4
 import net.minecraft.item.ItemStack
 

@@ -19,18 +19,13 @@
 package net.ccbluex.liquidbounce.features.command.commands.client
 
 import net.ccbluex.liquidbounce.api.ClientApi.requestSettingsList
-import net.ccbluex.liquidbounce.api.ClientApi.requestSettingsScript
 import net.ccbluex.liquidbounce.config.ConfigSystem
 import net.ccbluex.liquidbounce.features.command.Command
 import net.ccbluex.liquidbounce.features.command.builder.CommandBuilder
 import net.ccbluex.liquidbounce.features.command.builder.ParameterBuilder
-import net.ccbluex.liquidbounce.features.module.Module
-import net.ccbluex.liquidbounce.features.module.ModuleManager
 import net.ccbluex.liquidbounce.utils.client.chat
 import net.ccbluex.liquidbounce.utils.client.regular
 import net.ccbluex.liquidbounce.utils.client.variable
-import net.ccbluex.liquidbounce.utils.io.HttpClient.get
-
 object CommandConfig {
     fun createCommand(): Command {
         return CommandBuilder
@@ -64,16 +59,6 @@ object CommandConfig {
                             } else {
                                 "local"
                             }
-                        if (name.startsWith("http")) {
-                            get(name).runCatching {
-                                ConfigSystem.deserializeConfigurable(ModuleManager.modulesConfigurable, reader())
-                            }.onFailure {
-                                chat(regular(command.result("failedToLoadOnline", variable(name))))
-                            }.onSuccess {
-                                chat(regular(command.result("loadedOnline", variable(name))))
-                            }
-                            return@handler
-                        }
                         when (state) {
                             "local" -> {
                                 ConfigSystem.userConfigsFolder.resolve("$name.json").runCatching {
@@ -81,22 +66,10 @@ object CommandConfig {
                                         chat(regular(command.result("notFoundLocal", variable(name))))
                                         return@handler
                                     }
-
-                                    ConfigSystem.deserializeConfigurable(ModuleManager.modulesConfigurable, reader())
                                 }.onFailure {
                                     chat(regular(command.result("failedToLoadLocal", variable(name))))
                                 }.onSuccess {
                                     chat(regular(command.result("loadedLocal", variable(name))))
-                                }
-                            }
-
-                            "online" -> {
-                                requestSettingsScript(name).runCatching {
-                                    ConfigSystem.deserializeConfigurable(ModuleManager.modulesConfigurable, reader())
-                                }.onFailure {
-                                    chat(regular(command.result("failedToLoadOnline", variable(name))))
-                                }.onSuccess {
-                                    chat(regular(command.result("loadedOnline", variable(name))))
                                 }
                             }
 
@@ -182,10 +155,6 @@ object CommandConfig {
                                 createNewFile()
                             }
 
-                            // TODO: Fix module states being stored
-
-                            // Store the config
-                            ConfigSystem.serializeConfigurable(ModuleManager.modulesConfigurable, writer())
                         }.onFailure {
                             chat(regular(command.result("failedToCreate", variable(name))))
                         }.onSuccess {

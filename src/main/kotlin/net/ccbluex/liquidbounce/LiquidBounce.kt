@@ -30,8 +30,6 @@ import net.ccbluex.liquidbounce.features.command.CommandManager
 import net.ccbluex.liquidbounce.features.misc.AccountManager
 import net.ccbluex.liquidbounce.features.misc.FriendManager
 import net.ccbluex.liquidbounce.features.misc.ProxyManager
-import net.ccbluex.liquidbounce.features.module.ModuleManager
-import net.ccbluex.liquidbounce.features.tabs.Tabs
 import net.ccbluex.liquidbounce.render.engine.RenderEngine
 import net.ccbluex.liquidbounce.script.ScriptManager
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager
@@ -99,7 +97,6 @@ object LiquidBounce : Listenable {
 
             // Config
             ConfigSystem
-            globalEnemyConfigurable
 
             ChunkScanner
             WorldChangeNotifier
@@ -108,7 +105,6 @@ object LiquidBounce : Listenable {
             IpInfoApi
 
             // Features
-            ModuleManager
             CommandManager
             ThemeManager
             ScriptManager
@@ -118,7 +114,6 @@ object LiquidBounce : Listenable {
             ProxyManager
             AccountManager
             InventoryTracker
-            Tabs
             Chat
 
             // Initialize the render engine
@@ -129,7 +124,6 @@ object LiquidBounce : Listenable {
 
             // Register commands and modules
             CommandManager.registerInbuilt()
-            ModuleManager.registerInbuilt()
 
             // Load user scripts
             ScriptManager.loadScripts()

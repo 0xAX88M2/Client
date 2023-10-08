@@ -125,22 +125,14 @@ object CommandManager : Iterable<Command> {
         // client commands
         addCommand(CommandClient.createCommand())
         addCommand(CommandFriend.createCommand())
-        addCommand(CommandToggle.createCommand())
-        addCommand(CommandBind.createCommand())
         addCommand(CommandHelp.createCommand())
-        addCommand(CommandBinds.createCommand())
         addCommand(CommandPrefix.createCommand())
         addCommand(CommandClear.createCommand())
-        addCommand(CommandHide.createCommand())
         addCommand(CommandItems.createCommand())
-        addCommand(CommandPanic.createCommand())
-        addCommand(CommandValue.createCommand())
         addCommand(CommandPing.createCommand())
         addCommand(CommandRemoteView.createCommand())
-        addCommand(CommandXRay.createCommand())
         addCommand(CommandEnemy.createCommand())
         addCommand(CommandConfig.createCommand())
-        addCommand(CommandAutoDisable.createCommand())
 
         // creative commands
         addCommand(CommandItemRename.createCommand())

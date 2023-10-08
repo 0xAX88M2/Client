@@ -1,8 +1,5 @@
 package net.ccbluex.liquidbounce.utils.block.targetFinding
 
-import net.ccbluex.liquidbounce.features.module.modules.render.ModuleDebug
-import net.ccbluex.liquidbounce.features.module.modules.world.scaffold.ModuleScaffold
-import net.ccbluex.liquidbounce.render.engine.Color4b
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager
 import net.ccbluex.liquidbounce.utils.client.mc
 import net.ccbluex.liquidbounce.utils.entity.rotation
@@ -149,23 +146,6 @@ class StabilizedRotationTargetPositionFactory(val config: PositionFactoryConfigu
 
         val clampedFace = trimmedFace.clamp(cropBox)
         val targetFace = clampedFace
-
-        ModuleDebug.debugGeometry(ModuleScaffold, "optimalLine", ModuleDebug.DebuggedLine(optimalLine, Color4b.GREEN))
-        ModuleDebug.debugGeometry(
-            ModuleScaffold,
-            "optimalLineFromPlayer",
-            ModuleDebug.DebuggedLine(optimalLineFromPlayer, Color4b.WHITE)
-        )
-        ModuleDebug.debugGeometry(
-            ModuleScaffold,
-            "facePreCrop",
-            ModuleDebug.DebuggedBox(Box(trimmedFace.from, trimmedFace.to), Color4b(255, 0, 0, 64))
-        )
-        ModuleDebug.debugGeometry(
-            ModuleScaffold,
-            "cropBox",
-            ModuleDebug.DebuggedBox(cropBox, Color4b(0, 127, 127, 64))
-        )
 
         // Not much left of the area? Then don't try to sample a point on the face
         if (targetFace.area < 0.0001)

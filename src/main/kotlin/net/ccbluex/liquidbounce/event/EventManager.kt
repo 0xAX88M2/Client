@@ -78,7 +78,6 @@ object EventManager {
         ClientStartEvent::class,
         ClientShutdownEvent::class,
         ValueChangedEvent::class,
-        ToggleModuleEvent::class,
         NotificationEvent::class,
         ClientChatMessageEvent::class,
         ClientChatErrorEvent::class

@@ -23,8 +23,6 @@ import net.ccbluex.liquidbounce.config.Configurable
 import net.ccbluex.liquidbounce.event.AttackEvent
 import net.ccbluex.liquidbounce.event.EventManager
 import net.ccbluex.liquidbounce.features.misc.FriendManager
-import net.ccbluex.liquidbounce.features.module.modules.misc.ModuleAntiBot
-import net.ccbluex.liquidbounce.features.module.modules.misc.ModuleTeams
 import net.ccbluex.liquidbounce.utils.client.MC_1_8
 import net.ccbluex.liquidbounce.utils.client.mc
 import net.ccbluex.liquidbounce.utils.client.protocolVersion
@@ -92,18 +90,10 @@ class EnemyConfigurable : Configurable("Enemies") {
         if (suspect is LivingEntity && (dead || suspect.isAlive)) {
             // Check if enemy is invisible (or ignore being invisible)
             if (invisible || !suspect.isInvisible) {
-                if (attackable && !teamMates && ModuleTeams.isInClientPlayersTeam(suspect)) {
-                    return false
-                }
 
                 // Check if enemy is a player and should be considered as an enemy
                 if (suspect is PlayerEntity && suspect != mc.player) {
                     if (attackable && !friends && FriendManager.isFriend(suspect)) {
-                        return false
-                    }
-
-                    // Check if player might be a bot
-                    if (ModuleAntiBot.isBot(suspect)) {
                         return false
                     }
 

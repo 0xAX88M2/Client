@@ -23,8 +23,6 @@ import net.ccbluex.liquidbounce.event.EntityMarginEvent;
 import net.ccbluex.liquidbounce.event.EventManager;
 import net.ccbluex.liquidbounce.event.PlayerStepEvent;
 import net.ccbluex.liquidbounce.event.PlayerVelocityStrafe;
-import net.ccbluex.liquidbounce.features.module.modules.exploit.ModuleNoPitchLimit;
-import net.ccbluex.liquidbounce.features.module.modules.render.ModuleFreeCam;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.MathHelper;
@@ -70,16 +68,6 @@ public abstract class MixinEntity {
         callback.setReturnValue(marginEvent.getMargin());
     }
 
-    /**
-     * Hook no pitch limit exploit
-     */
-    @Redirect(method = "changeLookDirection", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/MathHelper;clamp(FFF)F"))
-    public float hookNoPitchLimit(float value, float min, float max) {
-        boolean noLimit = ModuleNoPitchLimit.INSTANCE.getEnabled();
-
-        if (noLimit) return value;
-        return MathHelper.clamp(value, min, max);
-    }
 
     @Redirect(method = "updateVelocity", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;movementInputToVelocity(Lnet/minecraft/util/math/Vec3d;FF)Lnet/minecraft/util/math/Vec3d;"))
     public Vec3d hookVelocity(Vec3d movementInput, float speed, float yaw) {
@@ -99,10 +87,6 @@ public abstract class MixinEntity {
         return stepEvent.getHeight();
     }
 
-    @Inject(method = "getCameraPosVec", at = @At("RETURN"), cancellable = true)
-    private void hookFreeCamModifiedRaycast(float tickDelta, CallbackInfoReturnable<Vec3d> cir) {
-        cir.setReturnValue(ModuleFreeCam.INSTANCE.modifyRaycast(cir.getReturnValue(), (Entity) (Object) this, tickDelta));
-    }
 
     /**
      * When modules that modify player's velocity are enabled while on a vehicle, the game essentially gets screwed up, making the player unable to move.

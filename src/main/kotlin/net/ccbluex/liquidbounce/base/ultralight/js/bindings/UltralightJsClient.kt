@@ -23,7 +23,6 @@ import net.ccbluex.liquidbounce.LiquidBounce
 import net.ccbluex.liquidbounce.api.IpInfoApi
 import net.ccbluex.liquidbounce.features.misc.AccountManager
 import net.ccbluex.liquidbounce.features.misc.ProxyManager
-import net.ccbluex.liquidbounce.features.module.ModuleManager
 import net.ccbluex.liquidbounce.utils.client.mc
 import net.minecraft.client.util.Session
 
@@ -31,8 +30,6 @@ import net.minecraft.client.util.Session
  * Referenced by JS as `client`
  */
 object UltralightJsClient {
-
-    val moduleManager = ModuleManager
     val accountManager = AccountManager
     val proxyManager = ProxyManager
 

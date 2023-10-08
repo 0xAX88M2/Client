@@ -21,7 +21,6 @@ package net.ccbluex.liquidbounce.config
 
 import net.ccbluex.liquidbounce.config.util.Exclude
 import net.ccbluex.liquidbounce.event.Listenable
-import net.ccbluex.liquidbounce.features.module.Module
 import net.ccbluex.liquidbounce.script.RequiredByScript
 import net.ccbluex.liquidbounce.utils.client.toLowerCamelCase
 import net.minecraft.client.MinecraftClient
@@ -37,24 +36,13 @@ import net.minecraft.text.Text
 open class ToggleableConfigurable(@Exclude val module: Module? = null, name: String, enabled: Boolean) : Listenable,
     Configurable(name, valueType = ValueType.TOGGLEABLE) {
 
-    val translationBaseKey: String
-        get() = "${module?.translationBaseKey}.value.${name.toLowerCamelCase()}"
 
-    val description: MutableText
-        get() = Text.translatable("$translationBaseKey.description")
 
     var enabled by boolean("Enabled", enabled).listen { newState ->
-        updateEnabled(this.module?.enabled ?: true, newState)
-
         newState
     }
 
     init {
-        this.module?.valueEnabled?.listen { newState ->
-            updateEnabled(newState, this.enabled)
-
-            newState
-        }
     }
 
     private var wasEnabled = false
@@ -74,8 +62,6 @@ open class ToggleableConfigurable(@Exclude val module: Module? = null, name: Str
     }
 
     override fun handleEvents() = super.handleEvents() && enabled
-
-    override fun parent() = module
 
     open fun enable() {}
     open fun disable() {}
@@ -100,11 +86,7 @@ open class ChoiceConfigurable(
 ) : Configurable(name, valueType = ValueType.CHOICE) {
 
     val choices: Array<Choice>
-    val translationBaseKey: String
-        get() = "${module.translationBaseKey}.value.${name.toLowerCamelCase()}"
 
-    val description: MutableText
-        get() = Text.translatable("$translationBaseKey.description")
 
     init {
         this.choices = choicesCallback(this)
@@ -133,12 +115,6 @@ open class ChoiceConfigurable(
  * A mode is sub-module to separate different bypasses into extra classes
  */
 abstract class Choice(name: String) : Configurable(name), Listenable, NamedChoice {
-
-    private val translationBaseKey: String
-        get() = "${this.parent.translationBaseKey}.choice.${name.toLowerCamelCase()}"
-
-    val description: MutableText
-        get() = Text.translatable("$translationBaseKey.description")
 
     override val choiceName: String
         get() = this.name
@@ -175,10 +151,6 @@ abstract class Choice(name: String) : Configurable(name), Listenable, NamedChoic
      */
     override fun handleEvents() = super.handleEvents() && isActive
 
-    /**
-     * Parent listenable
-     */
-    override fun parent() = this.parent.module
 
 }
 

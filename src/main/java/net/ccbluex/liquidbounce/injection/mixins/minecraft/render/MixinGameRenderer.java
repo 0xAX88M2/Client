@@ -23,11 +23,6 @@ import net.ccbluex.liquidbounce.event.EventManager;
 import net.ccbluex.liquidbounce.event.GameRenderEvent;
 import net.ccbluex.liquidbounce.event.ScreenRenderEvent;
 import net.ccbluex.liquidbounce.event.WorldRenderEvent;
-import net.ccbluex.liquidbounce.features.module.modules.fun.ModuleDankBobbing;
-import net.ccbluex.liquidbounce.features.module.modules.player.ModuleReach;
-import net.ccbluex.liquidbounce.features.module.modules.render.ModuleFreeCam;
-import net.ccbluex.liquidbounce.features.module.modules.render.ModuleNoBob;
-import net.ccbluex.liquidbounce.features.module.modules.render.ModuleNoHurtCam;
 import net.ccbluex.liquidbounce.interfaces.IMixinGameRenderer;
 import net.ccbluex.liquidbounce.utils.aiming.RaytracingExtensionsKt;
 import net.ccbluex.liquidbounce.utils.aiming.Rotation;
@@ -40,7 +35,6 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
@@ -161,58 +155,5 @@ public abstract class MixinGameRenderer implements IMixinGameRenderer {
         Matrix4f matrix4f = matrices.peek().getPositionMatrix();
         matrix4f.mul(new Matrix4f().translate((float) -cameraPosition.x, (float) -cameraPosition.y, (float) -cameraPosition.z));
         return matrix4f;
-    }
-
-    @Inject(method = "tiltViewWhenHurt", at = @At("HEAD"), cancellable = true)
-    private void injectHurtCam(MatrixStack matrixStack, float f, CallbackInfo callbackInfo) {
-        if (ModuleNoHurtCam.INSTANCE.getEnabled()) {
-            callbackInfo.cancel();
-        }
-    }
-
-    @Inject(method = "bobView", at = @At("HEAD"), cancellable = true)
-    private void injectBobView(MatrixStack matrixStack, float f, CallbackInfo callbackInfo) {
-        if (ModuleNoBob.INSTANCE.getEnabled()) {
-            callbackInfo.cancel();
-            return;
-        }
-
-        if (!ModuleDankBobbing.INSTANCE.getEnabled()) {
-            return;
-        }
-
-        if (!(client.getCameraEntity() instanceof PlayerEntity playerEntity)) {
-            return;
-        }
-
-        float additionalBobbing = ModuleDankBobbing.INSTANCE.getMotion();
-
-        float g = playerEntity.horizontalSpeed - playerEntity.prevHorizontalSpeed;
-        float h = -(playerEntity.horizontalSpeed + g * f);
-        float i = MathHelper.lerp(f, playerEntity.prevStrideDistance, playerEntity.strideDistance);
-        matrixStack.translate((MathHelper.sin(h * MathHelper.PI) * i * 0.5F), -Math.abs(MathHelper.cos(h * MathHelper.PI) * i), 0.0D);
-        matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(MathHelper.sin(h * MathHelper.PI) * i * (3.0F + additionalBobbing)));
-        matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(Math.abs(MathHelper.cos(h * MathHelper.PI - (0.2F + additionalBobbing)) * i) * 5.0F));
-
-        callbackInfo.cancel();
-    }
-
-    @Inject(method = "renderHand", at = @At("HEAD"), cancellable = true)
-    private void hookFreeCamDisableHandRender(MatrixStack matrices, Camera camera, float tickDelta, CallbackInfo ci) {
-        if (ModuleFreeCam.INSTANCE.shouldDisableHandRender()) {
-            ci.cancel();
-        }
-    }
-
-    @ModifyConstant(method = "updateTargetedEntity", constant = @Constant(doubleValue = 9.0))
-    private double hookReachModifyCombatReach(double constant) {
-        return ModuleReach.INSTANCE.getEnabled() ? (ModuleReach.INSTANCE.getCombatReach() * ModuleReach.INSTANCE.getCombatReach()) : constant;
-    }
-
-    @Inject(method = "updateTargetedEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getRotationVec(F)Lnet/minecraft/util/math/Vec3d;"))
-    private void hookReachModifyBlockReach(float tickDelta, CallbackInfo ci) {
-        if (ModuleReach.INSTANCE.getEnabled()) {
-            client.crosshairTarget = client.player.raycast(ModuleReach.INSTANCE.getBlockReach(), tickDelta, false);
-        }
     }
 }

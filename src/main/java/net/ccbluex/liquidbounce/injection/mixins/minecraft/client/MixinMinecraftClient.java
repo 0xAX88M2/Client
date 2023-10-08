@@ -20,8 +20,6 @@ package net.ccbluex.liquidbounce.injection.mixins.minecraft.client;
 
 import net.ccbluex.liquidbounce.LiquidBounce;
 import net.ccbluex.liquidbounce.event.*;
-import net.ccbluex.liquidbounce.features.module.modules.combat.ModulePerfectHit;
-import net.ccbluex.liquidbounce.features.module.modules.render.ModuleXRay;
 import net.ccbluex.liquidbounce.render.engine.RenderingFlags;
 import net.ccbluex.liquidbounce.utils.combat.CombatManager;
 import net.minecraft.SharedConstants;
@@ -65,17 +63,6 @@ public abstract class MixinMinecraftClient {
     private IntegratedServer server;
     @Shadow
     private int itemUseCooldown;
-
-    @Inject(method = "isAmbientOcclusionEnabled()Z", at = @At("HEAD"), cancellable = true)
-    private static void injectXRayFullBright(CallbackInfoReturnable<Boolean> callback) {
-        ModuleXRay module = ModuleXRay.INSTANCE;
-        if (!module.getEnabled() || !module.getFullBright()) {
-            return;
-        }
-
-        callback.setReturnValue(false);
-        callback.cancel();
-    }
 
     @Shadow
     @Nullable
@@ -196,31 +183,5 @@ public abstract class MixinMinecraftClient {
         UseCooldownEvent useCooldownEvent = new UseCooldownEvent(itemUseCooldown);
         EventManager.INSTANCE.callEvent(useCooldownEvent);
         itemUseCooldown = useCooldownEvent.getCooldown();
-    }
-
-    @Inject(method = "hasOutline", cancellable = true, at = @At("HEAD"))
-    private void injectOutlineESPFix(Entity entity, CallbackInfoReturnable<Boolean> cir) {
-        if (RenderingFlags.isCurrentlyRenderingEntityOutline().get()) {
-            cir.setReturnValue(true);
-        }
-    }
-
-    @Inject(method = "doAttack", at = @At("HEAD"), cancellable = true)
-    private void injectPerfectHit(CallbackInfoReturnable<Boolean> cir) {
-        if (player == null || crosshairTarget == null) {
-            return;
-        }
-
-        if (CombatManager.INSTANCE.shouldPauseCombat()) {
-            cir.setReturnValue(false);
-        }
-        if (!ModulePerfectHit.INSTANCE.getEnabled()) {
-            return;
-        }
-        float h = player.getAttackCooldownProgress(0.5F);
-
-        if (h <= 0.9 && crosshairTarget.getType() == HitResult.Type.ENTITY) {
-            cir.setReturnValue(false);
-        }
     }
 }

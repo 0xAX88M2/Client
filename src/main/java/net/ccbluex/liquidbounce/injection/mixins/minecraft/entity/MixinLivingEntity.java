@@ -21,12 +21,6 @@ package net.ccbluex.liquidbounce.injection.mixins.minecraft.entity;
 
 import net.ccbluex.liquidbounce.event.EventManager;
 import net.ccbluex.liquidbounce.event.PlayerJumpEvent;
-import net.ccbluex.liquidbounce.features.module.modules.movement.ModuleAirJump;
-import net.ccbluex.liquidbounce.features.module.modules.movement.ModuleAntiLevitation;
-import net.ccbluex.liquidbounce.features.module.modules.movement.ModuleNoJumpDelay;
-import net.ccbluex.liquidbounce.features.module.modules.movement.ModuleNoPush;
-import net.ccbluex.liquidbounce.features.module.modules.render.ModuleAntiBlind;
-import net.ccbluex.liquidbounce.features.module.modules.render.ModuleRotations;
 import net.ccbluex.liquidbounce.utils.aiming.Rotation;
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager;
 import net.ccbluex.liquidbounce.utils.aiming.RotationsConfigurable;
@@ -69,27 +63,6 @@ public abstract class MixinLivingEntity extends MixinEntity {
     @Nullable
     public abstract StatusEffectInstance getStatusEffect(StatusEffect effect);
 
-    /**
-     * Hook anti levitation module
-     */
-    @Redirect(method = "travel", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;hasStatusEffect(Lnet/minecraft/entity/effect/StatusEffect;)Z"))
-    public boolean hookTravelStatusEffect(LivingEntity livingEntity, StatusEffect effect) {
-        if ((effect == StatusEffects.LEVITATION || effect == StatusEffects.SLOW_FALLING) && ModuleAntiLevitation.INSTANCE.getEnabled()) {
-            livingEntity.fallDistance = 0f;
-            return false;
-        }
-
-        return livingEntity.hasStatusEffect(effect);
-    }
-
-    @Inject(method = "hasStatusEffect", at = @At("HEAD"), cancellable = true)
-    private void hookAntiNausea(StatusEffect effect, CallbackInfoReturnable<Boolean> cir) {
-        if (effect == StatusEffects.NAUSEA && ModuleAntiBlind.INSTANCE.getEnabled() && ModuleAntiBlind.INSTANCE.getAntiNausea()) {
-            cir.setReturnValue(false);
-            cir.cancel();
-        }
-    }
-
     @Redirect(method = "jump", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;getJumpVelocity()F"))
     private float hookJumpEvent(LivingEntity instance) {
         if (instance != MinecraftClient.getInstance().player) {
@@ -121,58 +94,6 @@ public abstract class MixinLivingEntity extends MixinEntity {
         float yaw = rotation.getYaw() * 0.017453292F;
 
         return instance.add(-MathHelper.sin(yaw) * 0.2F, 0.0, MathHelper.cos(yaw) * 0.2F);
-    }
-
-    @Inject(method = "pushAwayFrom", at = @At("HEAD"), cancellable = true)
-    private void hookNoPush(CallbackInfo callbackInfo) {
-        if (ModuleNoPush.INSTANCE.getEnabled()) {
-            callbackInfo.cancel();
-        }
-    }
-
-    @Inject(method = "tickMovement", at = @At("HEAD"))
-    private void hookTickMovement(CallbackInfo callbackInfo) {
-        if (ModuleNoJumpDelay.INSTANCE.getEnabled() && !ModuleAirJump.INSTANCE.getEnabled()) {
-            jumpingCooldown = 0;
-        }
-    }
-
-    @Inject(method = "tickMovement", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/LivingEntity;jumping:Z"))
-    private void hookAirJump(CallbackInfo callbackInfo) {
-        if (ModuleAirJump.INSTANCE.getEnabled() && jumping && jumpingCooldown == 0) {
-            this.jump();
-            jumpingCooldown = 10;
-        }
-    }
-
-    /**
-     * Body rotation yaw injection hook
-     */
-    @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;getYaw()F"), slice = @Slice(to = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;getYaw()F", ordinal = 1)))
-    private float hookBodyRotationsA(LivingEntity instance) {
-        if ((Object) this != MinecraftClient.getInstance().player) {
-            return instance.getYaw();
-        }
-
-        ModuleRotations rotations = ModuleRotations.INSTANCE;
-        Rotation rotation = rotations.displayRotations();
-
-        return rotations.shouldDisplayRotations() ? rotation.getYaw() : instance.getYaw();
-    }
-
-    /**
-     * Body rotation yaw injection hook
-     */
-    @Redirect(method = "turnHead", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;getYaw()F"))
-    private float hookBodyRotationsB(LivingEntity instance) {
-        if ((Object) this != MinecraftClient.getInstance().player) {
-            return instance.getYaw();
-        }
-
-        ModuleRotations rotations = ModuleRotations.INSTANCE;
-        Rotation rotation = rotations.displayRotations();
-
-        return rotations.shouldDisplayRotations() ? rotation.getYaw() : instance.getYaw();
     }
 
     /**

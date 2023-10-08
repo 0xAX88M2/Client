@@ -21,9 +21,6 @@ package net.ccbluex.liquidbounce.script
 import net.ccbluex.liquidbounce.features.command.CommandManager
 import net.ccbluex.liquidbounce.features.command.builder.CommandBuilder
 import net.ccbluex.liquidbounce.features.command.builder.ParameterBuilder
-import net.ccbluex.liquidbounce.features.module.Module
-import net.ccbluex.liquidbounce.features.module.ModuleManager
-import net.ccbluex.liquidbounce.script.bindings.features.JsModule
 import net.ccbluex.liquidbounce.script.bindings.features.JsSetting
 import net.ccbluex.liquidbounce.script.bindings.globals.JsClient
 import net.ccbluex.liquidbounce.script.bindings.globals.JsItem
@@ -114,21 +111,6 @@ class Script(val scriptFile: File) {
             return this@Script
         }
 
-    }
-
-    /**
-     * Registers a new script module
-     *
-     * @param moduleObject JavaScript object containing information about the module.
-     * @param callback JavaScript function to which the corresponding instance of [JsModule] is passed.
-     * @see JsModule
-     */
-    @Suppress("unused")
-    fun registerModule(moduleObject: Map<String, Any>, callback: (Module) -> Unit) {
-        val module = JsModule(moduleObject)
-        ModuleManager.addModule(module)
-        registeredModules += module
-        callback(module)
     }
 
     /**

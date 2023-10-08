@@ -19,7 +19,6 @@
 
 package net.ccbluex.liquidbounce.common;
 
-import net.ccbluex.liquidbounce.features.module.modules.exploit.ModuleGhostHand;
 import net.minecraft.block.BlockState;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.util.hit.BlockHitResult;
@@ -33,22 +32,6 @@ import net.minecraft.world.RaycastContext;
 public class TweakedMethods {
 
     public static BlockHitResult tweakedRaycast(BlockView blockView, RaycastContext context) {
-        if (ModuleGhostHand.INSTANCE.getEnabled()) {
-            var returned = (BlockHitResult) BlockView.raycast(context.getStart(), context.getEnd(), context, (contextx, pos) -> {
-                BlockState blockState = blockView.getBlockState(pos);
-
-                if (!ModuleGhostHand.INSTANCE.getTargetedBlocks().contains(blockState.getBlock()))
-                    return null;
-
-                VoxelShape voxelShape = contextx.getBlockShape(blockState, blockView, pos);
-
-                return blockView.raycastBlock(contextx.getStart(), contextx.getEnd(), pos, voxelShape, blockState);
-            }, (contextx) -> null);
-
-            if (returned != null)
-                return returned;
-        }
-
         return BlockView.raycast(context.getStart(), context.getEnd(), context, (contextx, pos) -> {
             BlockState blockState = blockView.getBlockState(pos);
             FluidState fluidState = blockView.getFluidState(pos);

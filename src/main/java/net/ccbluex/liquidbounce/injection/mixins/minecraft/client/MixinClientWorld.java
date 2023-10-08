@@ -21,15 +21,11 @@ package net.ccbluex.liquidbounce.injection.mixins.minecraft.client;
 
 import net.ccbluex.liquidbounce.event.EventManager;
 import net.ccbluex.liquidbounce.event.WorldDisconnectEvent;
-import net.ccbluex.liquidbounce.features.module.modules.render.ModuleTrueSight;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.world.ClientWorld;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ClientWorld.class)
 public class MixinClientWorld {
@@ -37,12 +33,5 @@ public class MixinClientWorld {
     @Inject(method = "disconnect", at = @At("RETURN"))
     private void injectWorldCloseEvent(CallbackInfo ci) {
         EventManager.INSTANCE.callEvent(new WorldDisconnectEvent());
-    }
-
-    @Inject(method = "getBlockParticle", at = @At("RETURN"), cancellable = true)
-    private void injectBlockParticle(CallbackInfoReturnable<Block> cir) {
-        if (ModuleTrueSight.INSTANCE.getEnabled() && ModuleTrueSight.INSTANCE.getBarriers()) {
-            cir.setReturnValue(Blocks.BARRIER);
-        }
     }
 }

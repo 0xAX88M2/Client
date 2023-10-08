@@ -18,9 +18,6 @@
  */
 package net.ccbluex.liquidbounce.utils.entity
 
-import net.ccbluex.liquidbounce.features.module.modules.player.ModuleEagle
-import net.ccbluex.liquidbounce.features.module.modules.render.ModuleDebug
-import net.ccbluex.liquidbounce.render.engine.Color4b
 import net.ccbluex.liquidbounce.render.engine.Vec3
 import net.ccbluex.liquidbounce.utils.aiming.Rotation
 import net.ccbluex.liquidbounce.utils.block.canStandOn
