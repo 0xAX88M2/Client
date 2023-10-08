@@ -34,8 +34,4 @@ public abstract class MixinEntityRenderer<T extends Entity> {
     @Final
     protected EntityRenderDispatcher dispatcher;
 
-    @Shadow
-    public abstract TextRenderer getTextRenderer();
-
-
 }
