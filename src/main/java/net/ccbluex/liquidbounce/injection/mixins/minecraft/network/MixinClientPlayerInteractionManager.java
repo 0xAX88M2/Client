@@ -22,8 +22,6 @@ import net.ccbluex.liquidbounce.event.AttackEvent;
 import net.ccbluex.liquidbounce.event.BlockBreakingProgressEvent;
 import net.ccbluex.liquidbounce.event.CancelBlockBreakingEvent;
 import net.ccbluex.liquidbounce.event.EventManager;
-import net.ccbluex.liquidbounce.utils.aiming.Rotation;
-import net.ccbluex.liquidbounce.utils.aiming.RotationManager;
 import net.ccbluex.liquidbounce.utils.client.SilentHotbar;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.entity.Entity;
@@ -79,22 +77,6 @@ public class MixinClientPlayerInteractionManager {
     @Redirect(method = "syncSelectedSlot", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/player/PlayerInventory;selectedSlot:I"))
     private int hookCustomSelectedSlot(PlayerInventory instance) {
         return SilentHotbar.INSTANCE.getServersideSlot();
-    }
-
-    /**
-     * Hook rotation-type packet modification
-     * <p>
-     * Rotate according to modified rotation to avoid being detected by movement sensitive anti-cheats.
-     */
-    @ModifyArgs(method = "interactItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/packet/c2s/play/PlayerMoveC2SPacket$Full;<init>(DDDFFZ)V"))
-    private void hookFixRotation(Args args) {
-        Rotation rotation = RotationManager.INSTANCE.getCurrentRotation();
-        if (rotation == null) {
-            return;
-        }
-
-        args.set(3, rotation.getYaw());
-        args.set(4, rotation.getPitch());
     }
 
 }

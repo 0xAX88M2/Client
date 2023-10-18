@@ -1,8 +1,6 @@
 package net.ccbluex.liquidbounce.utils.block.targetFinding
 
 import net.ccbluex.liquidbounce.config.NamedChoice
-import net.ccbluex.liquidbounce.utils.aiming.Rotation
-import net.ccbluex.liquidbounce.utils.aiming.RotationManager
 import net.ccbluex.liquidbounce.utils.block.canBeReplacedWith
 import net.ccbluex.liquidbounce.utils.block.getState
 import net.ccbluex.liquidbounce.utils.client.mc
@@ -103,60 +101,6 @@ fun getTargetPlanForPositionAndDirection(pos: BlockPos, direction: Direction, mo
 
 class PointOnFace(val face: Face, val point: Vec3d)
 
-fun findBestBlockPlacementTarget(pos: BlockPos, options: BlockPlacementTargetFindingOptions): BlockPlacementTarget? {
-    val state = pos.getState()!!
-
-    // We cannot place blocks when there is already a block at that position
-    if (isBlockSolid(state, pos)) {
-        return null
-    }
-
-    val offsetsToInvestigate =
-        options.offsetsToInvestigate.sortedByDescending {
-            options.offsetPriorityGetter(pos.add(it))
-        }
-
-    for (offset in offsetsToInvestigate) {
-        val posToInvestigate = pos.add(offset)
-        val blockStateToInvestigate = posToInvestigate.getState()!!
-
-        // Already a block in that position?
-        if (isBlockSolid(blockStateToInvestigate, posToInvestigate)) {
-            continue
-        }
-
-        val targetMode = if (blockStateToInvestigate.isAir) {
-            BlockTargetingMode.PLACE_AT_NEIGHBOR
-        } else {
-            BlockTargetingMode.REPLACE_EXISTING_BLOCK
-        }
-
-        // Check if we can actually replace the block
-        if (targetMode == BlockTargetingMode.REPLACE_EXISTING_BLOCK
-            && !blockStateToInvestigate.canBeReplacedWith(posToInvestigate, options.stackToPlaceWith)
-        )
-            continue
-
-        // Find the best plan to do the placement
-        val targetPlan = findBestTargetPlanForTargetPosition(posToInvestigate, targetMode) ?: continue
-
-        val currPos = targetPlan.blockPosToInteractWith
-
-        val face = findTargetPointOnFace(currPos.getState()!!, currPos, targetPlan, options) ?: continue
-
-        val rotation = RotationManager.makeRotation(face.point.add(Vec3d.of(currPos)), mc.player!!.eyes)
-
-        return BlockPlacementTarget(
-            currPos,
-            posToInvestigate,
-            targetPlan.interactionDirection,
-            face.face.from.y + currPos.y,
-            rotation
-        )
-    }
-
-    return null
-}
 
 private fun findTargetPointOnFace(
     currState: BlockState,
@@ -196,37 +140,6 @@ private fun findTargetPointOnFace(
     return face
 }
 
-
-data class BlockPlacementTarget(
-    /**
-     * BlockPos which is right-clicked
-     */
-    val interactedBlockPos: BlockPos,
-    /**
-     * Block pos at which a new block is placed
-     */
-    val placedBlock: BlockPos,
-    val direction: Direction,
-    /**
-     * Some blocks must be placed above a certain height of the block. For example stairs and slabs must be placed
-     * at the upper half (=> minY = 0.5) in order to be placed correctly
-     */
-    val minPlacementY: Double,
-    val rotation: Rotation
-) {
-    fun doesCrosshairTargetFullfitRequirements(crosshairTarget: BlockHitResult): Boolean {
-        if (crosshairTarget.type != HitResult.Type.BLOCK)
-            return false
-        if (crosshairTarget.blockPos != this.interactedBlockPos)
-            return false
-        if (crosshairTarget.side != this.direction)
-            return false
-        if (crosshairTarget.pos.y < this.minPlacementY)
-            return false
-
-        return true
-    }
-}
 
 private fun isBlockSolid(state: BlockState, pos: BlockPos) =
     state.isSideSolid(mc.world!!, pos, Direction.UP, SideShapeType.CENTER)

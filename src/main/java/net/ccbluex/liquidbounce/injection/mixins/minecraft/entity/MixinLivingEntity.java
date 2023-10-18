@@ -21,9 +21,6 @@ package net.ccbluex.liquidbounce.injection.mixins.minecraft.entity;
 
 import net.ccbluex.liquidbounce.event.EventManager;
 import net.ccbluex.liquidbounce.event.PlayerJumpEvent;
-import net.ccbluex.liquidbounce.utils.aiming.Rotation;
-import net.ccbluex.liquidbounce.utils.aiming.RotationManager;
-import net.ccbluex.liquidbounce.utils.aiming.RotationsConfigurable;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;
@@ -74,57 +71,4 @@ public abstract class MixinLivingEntity extends MixinEntity {
         return jumpEvent.getMotion();
     }
 
-    /**
-     * Hook velocity rotation modification
-     * <p>
-     * Jump according to modified rotation. Prevents detection by movement sensitive anticheats.
-     */
-    @Redirect(method = "jump", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/Vec3d;add(DDD)Lnet/minecraft/util/math/Vec3d;"))
-    private Vec3d hookFixRotation(Vec3d instance, double x, double y, double z) {
-        RotationManager rotationManager = RotationManager.INSTANCE;
-        Rotation rotation = rotationManager.getCurrentRotation();
-        if ((Object) this != MinecraftClient.getInstance().player) {
-            return instance.add(x, y, z);
-        }
-
-        if (rotationManager.getActiveConfigurable() == null || !rotationManager.getActiveConfigurable().getFixVelocity() || rotation == null) {
-            return instance.add(x, y, z);
-        }
-
-        float yaw = rotation.getYaw() * 0.017453292F;
-
-        return instance.add(-MathHelper.sin(yaw) * 0.2F, 0.0, MathHelper.cos(yaw) * 0.2F);
-    }
-
-    /**
-     * Fall flying using modified-rotation
-     */
-    @Redirect(method = "travel", at  = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;getPitch()F"))
-    private float hookModifyFallFlyingPitch(LivingEntity instance) {
-        RotationManager rotationManager = RotationManager.INSTANCE;
-        Rotation rotation = rotationManager.getCurrentRotation();
-        RotationsConfigurable configurable = rotationManager.getActiveConfigurable();
-
-        if (instance != MinecraftClient.getInstance().player || rotation == null || configurable == null || !configurable.getFixVelocity() || !configurable.getSilent()) {
-            return instance.getPitch();
-        }
-
-        return rotation.getPitch();
-    }
-
-    /**
-     * Fall flying using modified-rotation
-     */
-    @Redirect(method = "travel", at  = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;getRotationVector()Lnet/minecraft/util/math/Vec3d;"))
-    private Vec3d hookModifyFallFlyingRotationVector(LivingEntity instance) {
-        RotationManager rotationManager = RotationManager.INSTANCE;
-        Rotation rotation = rotationManager.getCurrentRotation();
-        RotationsConfigurable configurable = rotationManager.getActiveConfigurable();
-
-        if (instance != MinecraftClient.getInstance().player || rotation == null || configurable == null || !configurable.getFixVelocity() || !configurable.getSilent()) {
-            return instance.getRotationVector();
-        }
-
-        return rotation.getRotationVec();
-    }
 }

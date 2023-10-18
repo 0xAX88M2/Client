@@ -22,7 +22,6 @@ import net.ccbluex.liquidbounce.utils.client.mc
 import net.ccbluex.liquidbounce.utils.client.toRadians
 import net.ccbluex.liquidbounce.utils.math.plus
 import net.ccbluex.liquidbounce.utils.movement.DirectionalInput
-import net.ccbluex.liquidbounce.utils.movement.getDegreesRelativeToView
 import net.ccbluex.liquidbounce.utils.movement.getDirectionalInputForDegrees
 import net.minecraft.client.input.Input
 import net.minecraft.entity.Entity
@@ -471,35 +470,6 @@ class SimulatedPlayer(
 
         companion object {
             private const val MAX_WALKING_SPEED = 0.121
-
-            /**
-             * Guesses the current input of a server player based on player position and velocity
-             */
-            fun guessInput(entity: PlayerEntity): SimulatedPlayerInput {
-                val velocity = entity.pos.subtract(entity.prevPos)
-
-                val horizontalVelocity = velocity.horizontalLengthSquared()
-
-                val sprinting = horizontalVelocity >= MAX_WALKING_SPEED * MAX_WALKING_SPEED
-
-                val input = if (horizontalVelocity > 0.05 * 0.05) {
-                    val velocityAngle = getDegreesRelativeToView(velocity, yaw = entity.yaw)
-
-                    val velocityAngle1 = MathHelper.wrapDegrees(velocityAngle)
-
-                    getDirectionalInputForDegrees(DirectionalInput.NONE, velocityAngle1)
-                } else {
-                    DirectionalInput.NONE
-                }
-
-                val jumping = !entity.isOnGround
-
-                return SimulatedPlayerInput(
-                    input,
-                    jumping,
-                    sprinting
-                ).apply { this.slowDown = entity.isSneaking }
-            }
         }
 
     }

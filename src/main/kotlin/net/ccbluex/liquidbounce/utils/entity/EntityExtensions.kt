@@ -19,30 +19,25 @@
 package net.ccbluex.liquidbounce.utils.entity
 
 import net.ccbluex.liquidbounce.render.engine.Vec3
-import net.ccbluex.liquidbounce.utils.aiming.Rotation
 import net.ccbluex.liquidbounce.utils.block.canStandOn
 import net.ccbluex.liquidbounce.utils.client.mc
 import net.ccbluex.liquidbounce.utils.client.toRadians
 import net.ccbluex.liquidbounce.utils.math.plus
 import net.ccbluex.liquidbounce.utils.math.toBlockPos
 import net.ccbluex.liquidbounce.utils.movement.DirectionalInput
-import net.ccbluex.liquidbounce.utils.movement.HORIZONTAL_DIRECTIONS
 import net.ccbluex.liquidbounce.utils.movement.findEdgeCollision
 import net.minecraft.client.input.Input
 import net.minecraft.client.network.ClientPlayerEntity
 import net.minecraft.entity.Entity
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.damage.DamageSource
-import net.minecraft.entity.damage.DamageSources
 import net.minecraft.entity.effect.StatusEffects
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.stat.Stats
 import net.minecraft.util.math.Box
-import net.minecraft.util.math.Direction
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.Difficulty
 import kotlin.math.cos
-import kotlin.math.min
 import kotlin.math.sin
 import kotlin.math.sqrt
 
@@ -166,8 +161,6 @@ val Input.yAxisMovement: Float
         else -> 0.0f
     }
 
-val Entity.rotation: Rotation
-    get() = Rotation(yaw, pitch)
 
 val Entity.box: Box
     get() = boundingBox.expand(targetingMargin.toDouble())
@@ -201,12 +194,6 @@ fun Entity.interpolateCurrentPosition(tickDelta: Float): Vec3 {
     )
 }
 
-fun Entity.interpolateCurrentRotation(tickDelta: Float): Rotation {
-    return Rotation(
-        this.prevYaw + (this.yaw - this.prevYaw) * tickDelta,
-        this.prevPitch + (this.pitch - this.prevPitch) * tickDelta,
-    )
-}
 
 /**
  * Get the nearest point of a box. Very useful to calculate the distance of an enemy.

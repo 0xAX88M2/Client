@@ -112,7 +112,6 @@ function constructConfig(partname) {
 // All GUI Components that use svelte should be listed here
 export default [
     constructConfig("hud"),
-    constructConfig("clickgui"),
     constructConfig("title"),
     constructConfig("customize")
 ]
