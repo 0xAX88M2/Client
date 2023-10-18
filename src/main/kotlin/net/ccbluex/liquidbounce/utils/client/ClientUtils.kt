@@ -42,9 +42,9 @@ val logger: Logger
 
 
 // Chat formatting
-private val clientPrefix = "§f§lLiquid§9§lBounce §8▸ §7".asText()
+private val clientPrefix = "§f§eClient §8▸ §7".asText()
 
-fun dot() = regular(".")
+fun dot() = regular(">")
 
 fun regular(text: MutableText) = text.styled { it.withColor(Formatting.GRAY) }
 

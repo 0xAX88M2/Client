@@ -94,6 +94,9 @@ dependencies {
         exclude group: 'com.google.code.gson', module: 'gson'
     }
 
+    modRuntimeOnly "me.djtheredstoner:DevAuth-fabric:1.1.2"
+
+
     implementation 'com.github.CCBlueX:Elixir:1.2.6'
 
     implementation 'com.labymedia:ultralight-java-base:0.4.12'
